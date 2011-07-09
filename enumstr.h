@@ -67,11 +67,6 @@ public:
 		return pos >= 0 ? (m_pMapped + pos)->name : 0;
 	}
 
-    const char* GetName ( int value )
-	{
-		return GetName( static_cast<T> (value) );
-	}
-
     const char* NameAt ( int index )
 	{
 		ETMAP *pMapped = At(index);
@@ -125,7 +120,6 @@ T EnumHelper<T>::GetValue ( PCS name )
 	#define ENUM_ITEM( element )               { element, #element } ,
 	#define ENUM_ITEM_VALUE( element, value )  ENUM_ITEM( element )
 
-	//#define BEGIN_ENUM( ENUM_NAME )            template<> struct E_Map<ENUM_NAME> EnumHelper<ENUM_NAME>::m_arrMapped [10] = {
 	#define BEGIN_ENUM( ENUM_NAME )            template<> EnumHelper<ENUM_NAME>::ETMAP EnumHelper<ENUM_NAME>::m_arrMapped [] = {
 	#define END_ENUM( ENUM_NAME )              {invalid##ENUM_NAME##EnumValue, (0)} }; \
          static EnumHelper<ENUM_NAME> g_clsEnumHelper_##ENUM_NAME;
