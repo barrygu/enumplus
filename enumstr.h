@@ -2,8 +2,6 @@
 #undef ENUM_ITEM_VALUE
 #undef BEGIN_ENUM
 #undef END_ENUM
-#undef NUMBER_OF
-#undef INVALID_ENUM_ITEM
 
 #ifndef _ENUM_HELPER_CLASS_
 #define _ENUM_HELPER_CLASS_
@@ -68,7 +66,6 @@ public:
 		int pos = ValuePosition(value);
 		return pos >= 0 ? (m_pMapped + pos)->name : 0;
 	}
-
 };
 
 template <typename T>
