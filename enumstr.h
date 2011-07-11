@@ -9,62 +9,50 @@
 #define _ENUM_HELPER_CLASS_
 #include <string.h>
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(arr) ((int)(sizeof (arr) / sizeof (arr[0])))
+#endif // ARRAY_SIZE
+
 typedef const char * PCS;
-
-template <typename T>
-struct E_Map {
-    T value;
+typedef struct {
+    int value;
     PCS name;
-};
+} ETMAP;
 
-template <typename T>
-class EnumHelper
+class EnumBase
 {
-private:
-    typedef struct E_Map<T> ETMAP;
-    static struct E_Map<T> m_arrMapped[];
+protected:
+	int m_nSize;
     ETMAP *m_pMapped;
-    int m_nSize;
-	static EnumHelper<T> * m_pThis;
 
     bool Equal(PCS s1, PCS s2)
     { return (strcmp (s1, s2) == 0); }
 
-    bool Equal(T v1, T v2)
+    bool Equal(int v1, int v2)
     { return (v1 == v2); }
 
 public:
-    EnumHelper()
-    {
-        m_pThis = this;
-        m_pMapped = &m_arrMapped[0];
-        m_nSize = ((int)(sizeof ( m_arrMapped ) / sizeof ( m_arrMapped[0] )) - 1);
-    }
 
-    static EnumHelper<T> *GetSelf(void) { return m_pThis; }
-	ETMAP *At (int index)
-	{
-		return (index >= 0 && index < m_nSize) ? m_pMapped + index : 0;
-	}
+	EnumBase() : m_nSize(0), m_pMapped(0) {}
+	virtual ~EnumBase() {}
 
-    int GetSize(void) { return m_nSize; }
-    int ValuePosition ( T value );
-    T InvalidValue (void)
+	int GetSize() { return m_nSize; }
+    int ValuePosition ( int value );
+
+    int InvalidValue (void)
 	{
 		return ((m_pMapped + m_nSize)->value);
 	}
 
-    T ValueAt ( int index )
+    int ValueAt ( int index )
 	{
 		ETMAP *pMapped = At(index);
 		return pMapped ? pMapped->value : InvalidValue();
 	}
 
-    T GetValue ( PCS name );
-    const char* GetName ( T value )
+	ETMAP *At (int index)
 	{
-		int pos = ValuePosition(value);
-		return pos >= 0 ? (m_pMapped + pos)->name : 0;
+		return (index >= 0 && index < m_nSize) ? m_pMapped + index : 0;
 	}
 
     const char* NameAt ( int index )
@@ -72,12 +60,62 @@ public:
 		ETMAP *pMapped = At(index);
 		return pMapped ? pMapped->name : 0;
 	}
+
+    int GetValue ( PCS name );
+
+	const char* GetName ( int value )
+	{
+		int pos = ValuePosition(value);
+		return pos >= 0 ? (m_pMapped + pos)->name : 0;
+	}
+
+};
+
+template <typename T>
+class EnumHelper : public EnumBase
+{
+private:
+	static EnumHelper<T> * m_pThis;
+    static ETMAP m_arrMapped[];
+
+    bool Equal(T v1, T v2)
+    { return EnumBase::Equal((int)v1, (int)v2); }
+
+public:
+    EnumHelper()
+	{
+        m_pThis = this;
+        m_pMapped = &m_arrMapped[0];
+        m_nSize = ARRAY_SIZE(m_arrMapped) - 1;
+    }
+
+    static EnumHelper<T> *GetSelf(void) { return m_pThis; }
+
+    int ValuePosition ( T value ) { 
+		return EnumBase::ValuePosition((int)value);
+   	}
+
+    T InvalidValue (void) {
+		return static_cast<T>(EnumBase::InvalidValue());
+	}
+
+    T ValueAt ( int index ) {
+		return static_cast<T>(EnumBase::ValueAt(index));
+	}
+
+    T GetValue ( PCS name ) {
+		return static_cast<T>(EnumBase::GetValue(name));
+	}
+
+    const char* GetName ( T value ) {
+		return EnumBase::GetName( (int)value );
+	}
+
 };
 
 template <typename T> EnumHelper<T> * EnumHelper<T>::m_pThis = 0;
 
-template <typename T>
-int EnumHelper<T>::ValuePosition (T value)
+int EnumBase::ValuePosition (int value)
 {
     int i;
     ETMAP *pMapped = m_pMapped;
@@ -90,8 +128,7 @@ int EnumHelper<T>::ValuePosition (T value)
     return -1;
 }
 
-template <typename T>
-T EnumHelper<T>::GetValue ( PCS name )
+int EnumBase::GetValue ( PCS name )
 {
     int i;
     ETMAP *pMapped = m_pMapped;
@@ -113,14 +150,14 @@ T EnumHelper<T>::GetValue ( PCS name )
 
     #define BEGIN_ENUM( ENUM_NAME )           typedef enum etag##ENUM_NAME {
     #define END_ENUM( ENUM_NAME )             invalid##ENUM_NAME##EnumValue } ENUM_NAME;
-	#define GET_ENUM_HELPER( ENUM_NAME )      (EnumHelper<ENUM_NAME>::GetSelf())
+	#define ENUM_HELPER( ENUM_NAME )          (EnumHelper<ENUM_NAME>::GetSelf())
 
 #else
 
 	#define ENUM_ITEM( element )               { element, #element } ,
 	#define ENUM_ITEM_VALUE( element, value )  ENUM_ITEM( element )
 
-	#define BEGIN_ENUM( ENUM_NAME )            template<> EnumHelper<ENUM_NAME>::ETMAP EnumHelper<ENUM_NAME>::m_arrMapped [] = {
+	#define BEGIN_ENUM( ENUM_NAME )            template<> ETMAP EnumHelper<ENUM_NAME>::m_arrMapped [] = {
 	#define END_ENUM( ENUM_NAME )              {invalid##ENUM_NAME##EnumValue, (0)} }; \
          static EnumHelper<ENUM_NAME> g_clsEnumHelper_##ENUM_NAME;
 
