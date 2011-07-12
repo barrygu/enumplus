@@ -20,7 +20,7 @@ typedef struct {
 class EnumBase
 {
 protected:
-	int m_nSize;
+    int m_nSize;
     ETMAP *m_pMapped;
 
     bool Equal(PCS s1, PCS s2)
@@ -31,48 +31,48 @@ protected:
 
 public:
 
-	EnumBase() : m_nSize(0), m_pMapped(0) {}
-	virtual ~EnumBase() {}
+    EnumBase() : m_nSize(0), m_pMapped(0) {}
+    virtual ~EnumBase() {}
 
-	int GetSize() { return m_nSize; }
+    int GetSize() { return m_nSize; }
     int ValuePosition ( int value );
 
     int InvalidValue (void)
-	{
-		return ((m_pMapped + m_nSize)->value);
-	}
+    {
+        return ((m_pMapped + m_nSize)->value);
+    }
 
     int ValueAt ( int index )
-	{
-		ETMAP *pMapped = At(index);
-		return pMapped ? pMapped->value : InvalidValue();
-	}
+    {
+        ETMAP *pMapped = At(index);
+        return pMapped ? pMapped->value : InvalidValue();
+    }
 
-	ETMAP *At (int index)
-	{
-		return (index >= 0 && index < m_nSize) ? m_pMapped + index : 0;
-	}
+    ETMAP *At (int index)
+    {
+        return (index >= 0 && index < m_nSize) ? m_pMapped + index : 0;
+    }
 
     const char* NameAt ( int index )
-	{
-		ETMAP *pMapped = At(index);
-		return pMapped ? pMapped->name : 0;
-	}
+    {
+        ETMAP *pMapped = At(index);
+        return pMapped ? pMapped->name : 0;
+    }
 
     int GetValue ( PCS name );
 
-	const char* GetName ( int value )
-	{
-		int pos = ValuePosition(value);
-		return pos >= 0 ? (m_pMapped + pos)->name : 0;
-	}
+    const char* GetName ( int value )
+    {
+        int pos = ValuePosition(value);
+        return pos >= 0 ? (m_pMapped + pos)->name : 0;
+    }
 };
 
 template <typename T>
 class EnumHelper : public EnumBase
 {
 private:
-	static EnumHelper<T> * m_pThis;
+    static EnumHelper<T> * m_pThis;
     static ETMAP m_arrMapped[];
 
     bool Equal(T v1, T v2)
@@ -80,7 +80,7 @@ private:
 
 public:
     EnumHelper()
-	{
+    {
         m_pThis = this;
         m_pMapped = &m_arrMapped[0];
         m_nSize = ARRAY_SIZE(m_arrMapped) - 1;
@@ -89,24 +89,24 @@ public:
     static EnumHelper<T> *GetSelf(void) { return m_pThis; }
 
     int ValuePosition ( T value ) { 
-		return EnumBase::ValuePosition((int)value);
+        return EnumBase::ValuePosition((int)value);
    	}
 
     T InvalidValue (void) {
-		return static_cast<T>(EnumBase::InvalidValue());
-	}
+        return static_cast<T>(EnumBase::InvalidValue());
+    }
 
     T ValueAt ( int index ) {
-		return static_cast<T>(EnumBase::ValueAt(index));
-	}
+        return static_cast<T>(EnumBase::ValueAt(index));
+    }
 
     T GetValue ( PCS name ) {
-		return static_cast<T>(EnumBase::GetValue(name));
-	}
+        return static_cast<T>(EnumBase::GetValue(name));
+    }
 
     const char* GetName ( T value ) {
-		return EnumBase::GetName( (int)value );
-	}
+        return EnumBase::GetName( (int)value );
+    }
 
 };
 
@@ -133,7 +133,7 @@ int EnumBase::GetValue ( PCS name )
     {
         if ( Equal(pMapped->name, name) )
             return pMapped->value;
-		pMapped++;
+        pMapped++;
     }
     return InvalidValue();
 }
@@ -147,15 +147,15 @@ int EnumBase::GetValue ( PCS name )
 
     #define BEGIN_ENUM( ENUM_NAME )           typedef enum etag##ENUM_NAME {
     #define END_ENUM( ENUM_NAME )             invalid##ENUM_NAME##EnumValue } ENUM_NAME;
-	#define ENUM_HELPER( ENUM_NAME )          (EnumHelper<ENUM_NAME>::GetSelf())
+    #define ENUM_HELPER( ENUM_NAME )          (EnumHelper<ENUM_NAME>::GetSelf())
 
 #else
 
-	#define ENUM_ITEM( element )               { element, #element } ,
-	#define ENUM_ITEM_VALUE( element, value )  ENUM_ITEM( element )
+    #define ENUM_ITEM( element )               { element, #element } ,
+    #define ENUM_ITEM_VALUE( element, value )  ENUM_ITEM( element )
 
-	#define BEGIN_ENUM( ENUM_NAME )            template<> ETMAP EnumHelper<ENUM_NAME>::m_arrMapped [] = {
-	#define END_ENUM( ENUM_NAME )              {invalid##ENUM_NAME##EnumValue, (0)} }; \
+    #define BEGIN_ENUM( ENUM_NAME )            template<> ETMAP EnumHelper<ENUM_NAME>::m_arrMapped [] = {
+    #define END_ENUM( ENUM_NAME )              {invalid##ENUM_NAME##EnumValue, (0)} }; \
          static EnumHelper<ENUM_NAME> g_clsEnumHelper_##ENUM_NAME;
 
 #endif // defined GENERATE_ENUM_NAMES
