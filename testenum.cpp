@@ -57,7 +57,7 @@ int main(int argc, char* argv[], char* envp[])
 		if (name)
 		{
 			value = ((EnumHelper<Fruits> *)pEnumHelper)->GetValue(name);
-			if (value != ((EnumHelper<Fruits> *)pEnumHelper)->InvalidValue())
+			if ((int)value != pEnumHelper->InvalidValue())
 				printf("\t%-10s:\t%d\n", name, value);
 			else {
 				printf("    %d is not a valid item of Enum Fruits\n", i);
