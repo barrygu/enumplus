@@ -148,6 +148,7 @@ int EnumBase::GetValue ( PCS name )
     #define BEGIN_ENUM( ENUM_NAME )           typedef enum etag##ENUM_NAME {
     #define END_ENUM( ENUM_NAME )             invalid##ENUM_NAME##EnumValue } ENUM_NAME;
     #define ENUM_HELPER( ENUM_NAME )          (EnumHelper<ENUM_NAME>::GetSelf())
+    #define GET_ENUM_HELPER_PTR( ENUM_NAME, varName ) EnumHelper<ENUM_NAME> *varName = ENUM_HELPER(Fruits)
 
 #else
 

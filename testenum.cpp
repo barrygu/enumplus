@@ -46,25 +46,25 @@ int main(int argc, char* argv[], char* envp[])
 	printf("    Enum Numbers' invalid value is %d\n", pEnumHelper->InvalidValue() );
 
 	Fruits value;
-	pEnumHelper = ENUM_HELPER(Fruits);
-	printf("\nEnum Fruits elements: %d\n", pEnumHelper->GetSize());
-	for (i = 0; i < pEnumHelper->GetSize(); i++)
+	GET_ENUM_HELPER_PTR(Fruits, pFruits);
+	printf("\nEnum Fruits elements: %d\n", pFruits->GetSize());
+	for (i = 0; i < pFruits->GetSize(); i++)
 	{
-		value = ((EnumHelper<Fruits> *)pEnumHelper)->ValueAt(i);
-		name = pEnumHelper->NameAt(i);
+		value = pFruits->ValueAt(i);
+		name = pFruits->NameAt(i);
 
-		name = pEnumHelper->GetName(value);
+		name = pFruits->GetName(value);
 		if (name)
 		{
-			value = ((EnumHelper<Fruits> *)pEnumHelper)->GetValue(name);
-			if (value != ((EnumHelper<Fruits> *)pEnumHelper)->InvalidValue())
+			value = pFruits->GetValue(name);
+			if (value != pFruits->InvalidValue())
 				printf("\t%-10s:\t%d\n", name, value);
 			else {
 				printf("    %d is not a valid item of Enum Fruits\n", i);
 			}
 		}
 	}
-	printf("    Enum Fruits' invalid value is %d\n", pEnumHelper->InvalidValue() );
+	printf("    Enum Fruits' invalid value is %d\n", pFruits->InvalidValue() );
 
 	return 0;
 }
