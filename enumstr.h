@@ -111,7 +111,7 @@ public:
 };
 
 template <typename T> EnumHelper<T> * EnumHelper<T>::m_pThis = 0;
-
+/*
 int EnumBase::ValuePosition (int value)
 {
     int i;
@@ -121,6 +121,23 @@ int EnumBase::ValuePosition (int value)
         if ( Equal(pMapped->value, value) )
             return i;
         pMapped++;
+    }
+    return -1;
+}
+*/
+int EnumBase::ValuePosition (int value)
+{
+    int low = 0, high = m_nSize - 1, mid;
+
+    ETMAP *pMapped = m_pMapped;
+	while (low <= high) {
+		mid = (low + high) / 2;
+        if ( pMapped[mid].value == value )
+            return mid;
+		if ( pMapped[mid].value > value )
+			high = mid - 1;
+		else
+			low = mid + 1;
     }
     return -1;
 }
